@@ -1,0 +1,21 @@
+family,zone,logic,benchmark_id,reference,expected_unit,bloomberg_ticker,series_id,provider,symbol,instrument,exchange,native_unit,price_field,roll_rule,qualification,notes
+Crude Oil (Brut),Amériques,POL,wti,NYMEX WTI,USD/BBL,CL1 Comdty,yahoo-wti,yahoo,CL=F,NYMEX WTI,NYM,USD/BBL,close,provider_generic_unverified,same_underlying,Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés.
+Crude Oil (Brut),Europe / Afrique,POL,brent,ICE Brent,USD/BBL,CO1 Comdty,yahoo-brent,yahoo,BZ=F,NYMEX Brent Last Day Financial,NYM,USD/BBL,close,provider_generic_unverified,alternative,Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés. Place ou instrument alternatif à la référence de la note.
+Crude Oil (Brut),Orient,POL,oman,DME Oman,USD/BBL,OQA1 Comdty,,,,,,,,,,
+Fuel Oil HSFO,Amériques,POL,hsfo-us,US Gulf Coast Fuel Oil 3.0% Swap,USD/MT,MFB1 Comdty,,,,,,,,,,
+Fuel Oil HSFO,Europe / Afrique,POL,hsfo-rotterdam,Rotterdam Fuel Oil 3.5% Barges Swap,USD/MT,BAR1 Comdty,,,,,,,,,,
+Fuel Oil HSFO,Orient,POL,hsfo-singapore,Singapore Fuel Oil 380 CST Swap,USD/MT,SYS1 Comdty,,,,,,,,,,
+Fuel Oil VLSFO,Amériques,POL,vlsfo-us,US Gulf Coast Marine Fuel 0.5% Swap,USD/MT,AMR1 Comdty,,,,,,,,,,
+Fuel Oil VLSFO,Europe / Afrique,POL,vlsfo-rotterdam,Marine Fuel 0.5% Barges FOB Rdam Swap,USD/MT,S5FN1 Comdty,,,,,,,,,,
+Fuel Oil VLSFO,Orient,POL,vlsfo-singapore,Singapore Marine Fuel 0.5% Swap,USD/MT,MFT1 Comdty,,,,,,,,,,
+GNL (LNG),Asie,POD,jkm,JKM (Japan Korea Marker),USD/MMBtu,JKL1 Comdty,yahoo-jkm,yahoo,JKM=F,NYMEX LNG Japan/Korea Marker (Platts),NYM,USD/MMBtu,close,provider_generic_unverified,partially_qualified,Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés. Métadonnées Yahoo incomplètes ; unité issue de la spécification CME JKM.
+GNL (LNG),Europe,POD,ttf,TTF Pays-Bas,EUR/MWh,TZT1 Comdty,yahoo-ttf,yahoo,TTF=F,NYMEX Dutch TTF Natural Gas Calendar,NYM,EUR/MWh,close,provider_generic_unverified,alternative,Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés. Place ou instrument alternatif à la référence de la note.
+GNL (LNG),USA,POD,henry-hub,Henry Hub,USD/MMBtu,NG1 Comdty,yahoo-henry-hub,yahoo,NG=F,NYMEX Henry Hub,NYM,USD/MMBtu,close,provider_generic_unverified,same_underlying,Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés.
+GPL (Propane / Butane),Monde,POL,propane,Propane Mt Belvieu,US Cents/Gallon,PNL1 Comdty,,,,,,,,,,
+Gasoil / Diesel,Amériques,POL,ulsd,NYMEX Heating Oil,US Cents/Gallon,HO1 Comdty,yahoo-ulsd,yahoo,HO=F,NYMEX ULSD / Heating Oil,NYM,USD/Gallon,close,provider_generic_unverified,same_underlying,Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés.
+Gasoil / Diesel,Europe / Afrique,POL,gasoil-ice,ICE Gasoil,USD/MT,QS1 Comdty,,,,,,,,,,
+Gasoil / Diesel,Orient,POL,gasoil-singapore,Singapore Gasoil 10ppm (Platts),USD/MT,SGB1 Comdty,,,,,,,,,,
+Gasoline (Essence),Amériques,POL,rbob,NYMEX RBOB,US Cents/Gallon,XB1 Comdty,yahoo-rbob,yahoo,RB=F,NYMEX RBOB,NYM,USD/Gallon,close,provider_generic_unverified,same_underlying,Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés.
+Gasoline (Essence),Reste du Monde,POL,brent,ICE Brent,USD/BBL,CO1 Comdty,yahoo-brent,yahoo,BZ=F,NYMEX Brent Last Day Financial,NYM,USD/BBL,close,provider_generic_unverified,alternative,Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés. Place ou instrument alternatif à la référence de la note.
+Jet Fuel,Europe / Afrique,POL,gasoil-ice,ICE Gasoil,USD/MT,QS1 Comdty,,,,,,,,,,
+Jet Fuel,Orient,POL,jet-singapore,Singapore Jet Kerosene Swap,USD/BBL,JKS1 Comdty,,,,,,,,,,
