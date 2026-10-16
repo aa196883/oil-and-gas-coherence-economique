@@ -1,7 +1,5 @@
 # Catalogue Bloomberg Oil & Gas — à vérifier
 
-Les entrées conservent les statuts du fichier Excel : « Web vérifié » indique une attestation dans une source publique, pas une validation en direct dans Bloomberg. Les références sans ticker restent des pistes de couverture.
-
 ## Catalogue des références
 
 | Famille | Zone / corridor | Benchmark / instrument | Ticker Bloomberg | Nature | Unité | Vérification | Source URL ou document | Notes / action |

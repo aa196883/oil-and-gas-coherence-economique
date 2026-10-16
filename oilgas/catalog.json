@@ -1,0 +1,341 @@
+{
+  "benchmarks": [
+    {
+      "id": "oman",
+      "reference": "DME Oman",
+      "expected_unit": "USD/BBL",
+      "bloomberg_ticker": "OQA1 Comdty"
+    },
+    {
+      "id": "wti",
+      "reference": "NYMEX WTI",
+      "expected_unit": "USD/BBL",
+      "bloomberg_ticker": "CL1 Comdty"
+    },
+    {
+      "id": "brent",
+      "reference": "ICE Brent",
+      "expected_unit": "USD/BBL",
+      "bloomberg_ticker": "CO1 Comdty"
+    },
+    {
+      "id": "gasoil-singapore",
+      "reference": "Singapore Gasoil 10ppm (Platts)",
+      "expected_unit": "USD/MT",
+      "bloomberg_ticker": "SGB1 Comdty"
+    },
+    {
+      "id": "ulsd",
+      "reference": "NYMEX Heating Oil",
+      "expected_unit": "US Cents/Gallon",
+      "bloomberg_ticker": "HO1 Comdty"
+    },
+    {
+      "id": "gasoil-ice",
+      "reference": "ICE Gasoil",
+      "expected_unit": "USD/MT",
+      "bloomberg_ticker": "QS1 Comdty"
+    },
+    {
+      "id": "rbob",
+      "reference": "NYMEX RBOB",
+      "expected_unit": "US Cents/Gallon",
+      "bloomberg_ticker": "XB1 Comdty"
+    },
+    {
+      "id": "hsfo-singapore",
+      "reference": "Singapore Fuel Oil 380 CST Swap",
+      "expected_unit": "USD/MT",
+      "bloomberg_ticker": "SYS1 Comdty"
+    },
+    {
+      "id": "hsfo-us",
+      "reference": "US Gulf Coast Fuel Oil 3.0% Swap",
+      "expected_unit": "USD/MT",
+      "bloomberg_ticker": "MFB1 Comdty"
+    },
+    {
+      "id": "hsfo-rotterdam",
+      "reference": "Rotterdam Fuel Oil 3.5% Barges Swap",
+      "expected_unit": "USD/MT",
+      "bloomberg_ticker": "BAR1 Comdty"
+    },
+    {
+      "id": "vlsfo-singapore",
+      "reference": "Singapore Marine Fuel 0.5% Swap",
+      "expected_unit": "USD/MT",
+      "bloomberg_ticker": "MFT1 Comdty"
+    },
+    {
+      "id": "vlsfo-us",
+      "reference": "US Gulf Coast Marine Fuel 0.5% Swap",
+      "expected_unit": "USD/MT",
+      "bloomberg_ticker": "AMR1 Comdty"
+    },
+    {
+      "id": "vlsfo-rotterdam",
+      "reference": "Marine Fuel 0.5% Barges FOB Rdam Swap",
+      "expected_unit": "USD/MT",
+      "bloomberg_ticker": "S5FN1 Comdty"
+    },
+    {
+      "id": "jet-singapore",
+      "reference": "Singapore Jet Kerosene Swap",
+      "expected_unit": "USD/BBL",
+      "bloomberg_ticker": "JKS1 Comdty"
+    },
+    {
+      "id": "propane",
+      "reference": "Propane Mt Belvieu",
+      "expected_unit": "US Cents/Gallon",
+      "bloomberg_ticker": "PNL1 Comdty"
+    },
+    {
+      "id": "jkm",
+      "reference": "JKM (Japan Korea Marker)",
+      "expected_unit": "USD/MMBtu",
+      "bloomberg_ticker": "JKL1 Comdty"
+    },
+    {
+      "id": "ttf",
+      "reference": "TTF Pays-Bas",
+      "expected_unit": "EUR/MWh",
+      "bloomberg_ticker": "TZT1 Comdty"
+    },
+    {
+      "id": "henry-hub",
+      "reference": "Henry Hub",
+      "expected_unit": "USD/MMBtu",
+      "bloomberg_ticker": "NG1 Comdty"
+    }
+  ],
+  "routes": [
+    {
+      "family": "Crude Oil (Brut)",
+      "zone": "Orient",
+      "logic": "POL",
+      "benchmark_id": "oman"
+    },
+    {
+      "family": "Crude Oil (Brut)",
+      "zone": "Amériques",
+      "logic": "POL",
+      "benchmark_id": "wti"
+    },
+    {
+      "family": "Crude Oil (Brut)",
+      "zone": "Europe / Afrique",
+      "logic": "POL",
+      "benchmark_id": "brent"
+    },
+    {
+      "family": "Gasoil / Diesel",
+      "zone": "Orient",
+      "logic": "POL",
+      "benchmark_id": "gasoil-singapore"
+    },
+    {
+      "family": "Gasoil / Diesel",
+      "zone": "Amériques",
+      "logic": "POL",
+      "benchmark_id": "ulsd"
+    },
+    {
+      "family": "Gasoil / Diesel",
+      "zone": "Europe / Afrique",
+      "logic": "POL",
+      "benchmark_id": "gasoil-ice"
+    },
+    {
+      "family": "Gasoline (Essence)",
+      "zone": "Amériques",
+      "logic": "POL",
+      "benchmark_id": "rbob"
+    },
+    {
+      "family": "Gasoline (Essence)",
+      "zone": "Reste du Monde",
+      "logic": "POL",
+      "benchmark_id": "brent"
+    },
+    {
+      "family": "Fuel Oil HSFO",
+      "zone": "Orient",
+      "logic": "POL",
+      "benchmark_id": "hsfo-singapore"
+    },
+    {
+      "family": "Fuel Oil HSFO",
+      "zone": "Amériques",
+      "logic": "POL",
+      "benchmark_id": "hsfo-us"
+    },
+    {
+      "family": "Fuel Oil HSFO",
+      "zone": "Europe / Afrique",
+      "logic": "POL",
+      "benchmark_id": "hsfo-rotterdam"
+    },
+    {
+      "family": "Fuel Oil VLSFO",
+      "zone": "Orient",
+      "logic": "POL",
+      "benchmark_id": "vlsfo-singapore"
+    },
+    {
+      "family": "Fuel Oil VLSFO",
+      "zone": "Amériques",
+      "logic": "POL",
+      "benchmark_id": "vlsfo-us"
+    },
+    {
+      "family": "Fuel Oil VLSFO",
+      "zone": "Europe / Afrique",
+      "logic": "POL",
+      "benchmark_id": "vlsfo-rotterdam"
+    },
+    {
+      "family": "Jet Fuel",
+      "zone": "Orient",
+      "logic": "POL",
+      "benchmark_id": "jet-singapore"
+    },
+    {
+      "family": "Jet Fuel",
+      "zone": "Europe / Afrique",
+      "logic": "POL",
+      "benchmark_id": "gasoil-ice"
+    },
+    {
+      "family": "GPL (Propane / Butane)",
+      "zone": "Monde",
+      "logic": "POL",
+      "benchmark_id": "propane"
+    },
+    {
+      "family": "GNL (LNG)",
+      "zone": "Asie",
+      "logic": "POD",
+      "benchmark_id": "jkm"
+    },
+    {
+      "family": "GNL (LNG)",
+      "zone": "Europe",
+      "logic": "POD",
+      "benchmark_id": "ttf"
+    },
+    {
+      "family": "GNL (LNG)",
+      "zone": "USA",
+      "logic": "POD",
+      "benchmark_id": "henry-hub"
+    }
+  ],
+  "series": [
+    {
+      "id": "yahoo-wti",
+      "benchmark_id": "wti",
+      "provider": "yahoo",
+      "symbol": "CL=F",
+      "instrument": "NYMEX WTI",
+      "exchange": "NYM",
+      "currency": "USD",
+      "unit": "USD/BBL",
+      "price_field": "close",
+      "roll_rule": "provider_generic_unverified",
+      "qualification": "same_underlying",
+      "notes": "Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés.",
+      "enabled": 1
+    },
+    {
+      "id": "yahoo-brent",
+      "benchmark_id": "brent",
+      "provider": "yahoo",
+      "symbol": "BZ=F",
+      "instrument": "NYMEX Brent Last Day Financial",
+      "exchange": "NYM",
+      "currency": "USD",
+      "unit": "USD/BBL",
+      "price_field": "close",
+      "roll_rule": "provider_generic_unverified",
+      "qualification": "alternative",
+      "notes": "Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés. Place ou instrument alternatif à la référence de la note.",
+      "enabled": 1
+    },
+    {
+      "id": "yahoo-ulsd",
+      "benchmark_id": "ulsd",
+      "provider": "yahoo",
+      "symbol": "HO=F",
+      "instrument": "NYMEX ULSD / Heating Oil",
+      "exchange": "NYM",
+      "currency": "USD",
+      "unit": "USD/Gallon",
+      "price_field": "close",
+      "roll_rule": "provider_generic_unverified",
+      "qualification": "same_underlying",
+      "notes": "Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés.",
+      "enabled": 1
+    },
+    {
+      "id": "yahoo-rbob",
+      "benchmark_id": "rbob",
+      "provider": "yahoo",
+      "symbol": "RB=F",
+      "instrument": "NYMEX RBOB",
+      "exchange": "NYM",
+      "currency": "USD",
+      "unit": "USD/Gallon",
+      "price_field": "close",
+      "roll_rule": "provider_generic_unverified",
+      "qualification": "same_underlying",
+      "notes": "Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés.",
+      "enabled": 1
+    },
+    {
+      "id": "yahoo-henry-hub",
+      "benchmark_id": "henry-hub",
+      "provider": "yahoo",
+      "symbol": "NG=F",
+      "instrument": "NYMEX Henry Hub",
+      "exchange": "NYM",
+      "currency": "USD",
+      "unit": "USD/MMBtu",
+      "price_field": "close",
+      "roll_rule": "provider_generic_unverified",
+      "qualification": "same_underlying",
+      "notes": "Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés.",
+      "enabled": 1
+    },
+    {
+      "id": "yahoo-ttf",
+      "benchmark_id": "ttf",
+      "provider": "yahoo",
+      "symbol": "TTF=F",
+      "instrument": "NYMEX Dutch TTF Natural Gas Calendar",
+      "exchange": "NYM",
+      "currency": "EUR",
+      "unit": "EUR/MWh",
+      "price_field": "close",
+      "roll_rule": "provider_generic_unverified",
+      "qualification": "alternative",
+      "notes": "Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés. Place ou instrument alternatif à la référence de la note.",
+      "enabled": 1
+    },
+    {
+      "id": "yahoo-jkm",
+      "benchmark_id": "jkm",
+      "provider": "yahoo",
+      "symbol": "JKM=F",
+      "instrument": "NYMEX LNG Japan/Korea Marker (Platts)",
+      "exchange": "NYM",
+      "currency": "USD",
+      "unit": "USD/MMBtu",
+      "price_field": "close",
+      "roll_rule": "provider_generic_unverified",
+      "qualification": "partially_qualified",
+      "notes": "Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés. Métadonnées Yahoo incomplètes ; unité issue de la spécification CME JKM.",
+      "enabled": 1
+    }
+  ]
+}
