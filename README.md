@@ -11,6 +11,33 @@ python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 ```
 
+## Interface locale
+
+```bash
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m oilgas.web
+```
+
+Ouvrir **http://127.0.0.1:5003**. Une autre base peut être sélectionnée au lancement avec `.venv/bin/python -m oilgas.web --db chemin.sqlite`.
+
+La page propose uniquement le calcul des deltas : prix en USD/MT, famille, zone, série facultative, dates de début/fin et taux EUR/USD si nécessaire. Les familles, zones et séries viennent de la base. Le prix est à saisir ; la période initiale correspond aux 30 derniers jours calendaires de la couverture Brent disponible.
+
+**Dans l’interface uniquement**, un taux EUR/USD nécessaire laissé vide vaut **1,12**. Le taux effectivement utilisé apparaît dans le résultat. La CLI continue d’exiger `--eur-usd` pour une référence en euros. Les virgules et points décimaux sont acceptés dans les champs prix et taux de l’interface.
+
+Le graphique présente un delta par date, en pourcentage, avec des barres indépendantes partant de zéro. Les deux signes suivent la même échelle symétrique et la même couleur : l’intensité augmente avec l’écart absolu, sans seuil de risque arbitraire. L’écart absolu moyen évite que les écarts positifs et négatifs se compensent. Le survol et le tableau dépliable donnent les valeurs quotidiennes ; les longues périodes défilent horizontalement sans agrégation. Modifier un paramètre retire l’ancien résultat jusqu’au prochain calcul.
+
+Interface desktop, inspirée de la palette de `benchmark_hscode_matching`. Aucun téléchargement de données ni service graphique externe n’est déclenché par la page. Le serveur écoute localement sur le port 5003.
+
+### Vérification visuelle avec Playwright
+
+```bash
+.venv/bin/python -m pip install -r requirements-dev.txt
+.venv/bin/python -m playwright install chromium
+.venv/bin/python -m tests.browser_checks
+```
+
+Le port 5003 doit être libre. Le parcours lance Flask avec une base temporaire, vérifie les interactions dans Chromium puis arrête son serveur. Les captures desktop sont produites dans `artifacts/ui/` (ignoré par Git). La base locale n’est pas modifiée. Les tests Flask sans navigateur font partie de la suite unittest habituelle.
+
 ## Collecter et consulter les futures
 
 ```bash
@@ -33,19 +60,31 @@ Les requêtes HTTP 429/500/502/503/504 et les erreurs réseau sont retentées ju
 ## Calculer les deltas
 
 ```bash
-python -m oilgas deltas --price 100 --family 'Crude Oil (Brut)' --zone 'Europe / Afrique' --start 2024-01-01 --end 2024-01-31
+python -m oilgas deltas --price 733 --family 'Crude Oil (Brut)' --zone 'Europe / Afrique' --start 2024-01-01 --end 2024-01-31
 ```
 
-`--price` est le prix à comparer, exprimé dans `expected_unit`. Pour chaque date disponible dans la période inclusive, le delta est `(price − prix_de_référence) / prix_de_référence` : `0.25` signifie +25 %. Cette V1 utilise directement les prix stockés, sans fret ni conversion, et ne complète pas les jours manquants.
+**`--price` est toujours exprimé en USD/MT (dollars par tonne métrique)**, quelle que soit la famille ou la zone. Avant le calcul, la référence native est convertie en USD/MT à l’aide d’un coefficient fixe explicitement déclaré dans `oilgas/catalog.json`. Pour chaque date disponible, le delta est `(prix fourni − référence convertie) / référence convertie` : `0.25` signifie +25 %. Par exemple, 100 USD/baril de Brent donnent 733 USD/MT ; `--price 733` donne alors un delta nul.
 
-La sortie JSON contient uniquement un bloc `ref` (`logic`, `reference`, `expected_unit`, `instrument`) et une liste `deltas` de paires `[date, delta]`, une paire par ligne. Par exemple, pour des références de 80 et 125 et un prix fourni de 100 :
+Pour le TTF en euros, fournir obligatoirement le taux de change :
+
+```bash
+python -m oilgas deltas --price 800 --eur-usd 1.10 --family 'GNL (LNG)' --zone 'Europe' --start 2024-01-01 --end 2024-01-31
+```
+
+`--eur-usd 1.10` signifie **1 EUR = 1,10 USD**, constant sur toute la période. Aucun taux n’est téléchargé ou choisi par défaut. Ce paramètre n’est pas nécessaire pour les références en dollars ; s’il est fourni, il est validé mais ne les modifie pas.
+
+Les coefficients volume/masse et énergie/masse sont des **moyennes conventionnelles**, pas des mesures de qualité du produit. Le GNL utilise systématiquement 52 MMBtu/tonne, sans déduction de composition. Le Brent servant de référence à l’essence conserve son coefficient de brut. La [table de conversion](docs/normalisation.md) documente chaque facteur et ses limites.
+
+La base et `prices` restent en unités natives. Les deux tables sont inchangées ; la normalisation intervient uniquement dans `deltas`, sans fret ni interpolation.
+
+La sortie JSON contient uniquement un bloc `ref` (`logic`, `reference`, `expected_unit`, `instrument`) et une liste `deltas` de paires `[date, delta]`, une paire par ligne. Par exemple, pour des références déjà converties de 80 et 125 USD/MT et un prix fourni de 100 USD/MT :
 
 ```json
 {
   "ref": {
     "logic": "POL",
     "reference": "Référence du catalogue",
-    "expected_unit": "USD/BBL",
+    "expected_unit": "USD/MT",
     "instrument": "Instrument de la série sélectionnée"
   },
   "deltas": [
@@ -55,7 +94,7 @@ La sortie JSON contient uniquement un bloc `ref` (`logic`, `reference`, `expecte
 }
 ```
 
-Si plusieurs séries ont des observations, choisir avec `--series`. Une référence nulle, une unité native différente de l’unité attendue, un nombre non fini ou l’absence de données produit une erreur explicite sans résultat partiel.
+Si plusieurs séries ont des observations, choisir avec `--series`. Une référence nulle, une conversion absente, une devise incompatible, un coefficient/taux invalide, un nombre non fini ou l’absence de données produit une erreur explicite sans résultat partiel. La correspondance benchmark/unité est exacte, y compris pour une série externe : aucune conversion n’est devinée. Le jet de Singapour en USD/BBL est refusé tant qu’un coefficient n’a pas été établi dans le catalogue.
 
 ## Importer un téléchargement externe
 
@@ -100,6 +139,6 @@ La provenance par observation et l’historique des ingestions ne sont plus stoc
 
 Architecture et invariants : [docs/architecture.md](docs/architecture.md). Consignes de développement et commandes : [AGENTS.md](AGENTS.md).
 
-Aucune conversion, interpolation, estimation de fret, reconstruction du contrat Bloomberg ou analyse de cohérence de facture n’est réalisée. Les génériques Yahoo ont une règle de roll non vérifiée ; les alternatives et la qualification partielle de JKM restent visibles dans les résultats.
+Seule la conversion explicite en USD/MT pour les deltas est réalisée. Aucune interpolation, estimation de fret, reconstruction du contrat Bloomberg ou analyse de cohérence de facture n’est réalisée. Les génériques Yahoo ont une règle de roll non vérifiée ; les alternatives et la qualification partielle de JKM restent visibles dans les résultats.
 
 Tests hors réseau dans `tests/` : `.venv/bin/python -m unittest discover -s tests -v`.

@@ -105,7 +105,7 @@ class OilGasTests(unittest.TestCase):
     def deltas(self, *extra):
         output, errors = io.StringIO(), io.StringIO()
         with contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors):
-            code = main(['--db', str(self.path), 'deltas', '--price', '100',
+            code = main(['--db', str(self.path), 'deltas', '--price', '733',
                          '--family', 'Crude Oil (Brut)', '--zone', 'Europe / Afrique',
                          '--start', '2024-01-01', '--end', '2024-01-31', *extra])
         return code, output.getvalue(), errors.getvalue()
@@ -120,9 +120,11 @@ class OilGasTests(unittest.TestCase):
         result = json.loads(output)
         self.assertEqual(set(result), {'ref', 'deltas'})
         self.assertEqual(set(result['ref']), {'logic', 'reference', 'expected_unit', 'instrument'})
-        self.assertEqual(result['deltas'], [
-            ['2024-01-01', 0.25], ['2024-01-15', 0], ['2024-01-31', -0.2]])
-        self.assertIn('["2024-01-01", 0.25]', output)
+        self.assertEqual(result['ref']['expected_unit'], 'USD/MT')
+        self.assertEqual([r[0] for r in result['deltas']], ['2024-01-01', '2024-01-15', '2024-01-31'])
+        for row, expected in zip(result['deltas'], [0.25, 0, -0.2]):
+            self.assertAlmostEqual(row[1], expected)
+        self.assertIn('["2024-01-15", 0.0]', output)
 
     def test_deltas_errors(self):
         self.assertEqual(self.deltas()[0], 1)
@@ -136,7 +138,7 @@ class OilGasTests(unittest.TestCase):
             self.assertEqual((code, output), (1, ''))
         with self.db:
             self.db.execute("UPDATE metadata SET unit='USD/MT' WHERE series_id='yahoo-brent'")
-        self.assertIn('Unité', self.deltas()[2])
+        self.assertIn('Conversion vers USD/MT non renseignée', self.deltas()[2])
 
     def test_deltas_requires_one_series(self):
         source = {k: v for k, v in selected(self.db, ['yahoo-brent'])[0].items() if k != 'enabled'}

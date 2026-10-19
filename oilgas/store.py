@@ -138,7 +138,7 @@ def price_rows(db, family, zone, start, end, series=None):
         raise DataError('start doit précéder end')
     if not db.execute('SELECT 1 FROM metadata WHERE family=? AND zone=?', (family, zone)).fetchone():
         raise DataError('Couple famille/zone inconnu ; consulter catalog')
-    sql = '''SELECT m.family,m.zone,m.logic,m.reference,m.expected_unit,
+    sql = '''SELECT m.family,m.zone,m.logic,m.reference,m.expected_unit,m.benchmark_id,m.currency,
         m.series_id,m.provider,m.symbol,m.instrument,m.unit AS native_unit,
         m.price_field,m.roll_rule,m.qualification,m.notes,p.date,p.price
         FROM metadata m JOIN prices p ON p.metadata_id=m.id

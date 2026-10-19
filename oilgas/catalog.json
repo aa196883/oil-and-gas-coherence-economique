@@ -337,5 +337,117 @@
       "notes": "Clôture générique fournisseur ; roll et équivalence Bloomberg non certifiés. Métadonnées Yahoo incomplètes ; unité issue de la spécification CME JKM.",
       "enabled": 1
     }
-  ]
+  ],
+  "conversions": {
+    "oman": {
+      "USD/BBL": {
+        "currency": "USD",
+        "factor": 7.33
+      }
+    },
+    "wti": {
+      "USD/BBL": {
+        "currency": "USD",
+        "factor": 7.33
+      }
+    },
+    "brent": {
+      "USD/BBL": {
+        "currency": "USD",
+        "factor": 7.33
+      }
+    },
+    "gasoil-singapore": {
+      "USD/MT": {
+        "currency": "USD",
+        "factor": 1
+      }
+    },
+    "ulsd": {
+      "USD/Gallon": {
+        "currency": "USD",
+        "factor": 312.9
+      },
+      "US Cents/Gallon": {
+        "currency": "USD",
+        "factor": 3.129
+      }
+    },
+    "gasoil-ice": {
+      "USD/MT": {
+        "currency": "USD",
+        "factor": 1
+      }
+    },
+    "rbob": {
+      "USD/Gallon": {
+        "currency": "USD",
+        "factor": 357
+      },
+      "US Cents/Gallon": {
+        "currency": "USD",
+        "factor": 3.57
+      }
+    },
+    "hsfo-singapore": {
+      "USD/MT": {
+        "currency": "USD",
+        "factor": 1
+      }
+    },
+    "hsfo-us": {
+      "USD/MT": {
+        "currency": "USD",
+        "factor": 1
+      }
+    },
+    "hsfo-rotterdam": {
+      "USD/MT": {
+        "currency": "USD",
+        "factor": 1
+      }
+    },
+    "vlsfo-singapore": {
+      "USD/MT": {
+        "currency": "USD",
+        "factor": 1
+      }
+    },
+    "vlsfo-us": {
+      "USD/MT": {
+        "currency": "USD",
+        "factor": 1
+      }
+    },
+    "vlsfo-rotterdam": {
+      "USD/MT": {
+        "currency": "USD",
+        "factor": 1
+      }
+    },
+    "propane": {
+      "US Cents/Gallon": {
+        "currency": "USD",
+        "factor": 5.208
+      }
+    },
+    "jkm": {
+      "USD/MMBtu": {
+        "currency": "USD",
+        "factor": 52
+      }
+    },
+    "ttf": {
+      "EUR/MWh": {
+        "currency": "EUR",
+        "factor": 15.2396972
+      }
+    },
+    "henry-hub": {
+      "USD/MMBtu": {
+        "currency": "USD",
+        "factor": 52
+      }
+    }
+  }
 }

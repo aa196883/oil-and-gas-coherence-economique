@@ -65,7 +65,8 @@ def parser():
         if name == 'prices':
             cmd.add_argument('--format', choices=['json', 'csv'], default='json')
         else:
-            cmd.add_argument('--price', required=True, type=float)
+            cmd.add_argument('--price', required=True, type=float, help='Prix à comparer en USD/MT (dollars par tonne métrique)')
+            cmd.add_argument('--eur-usd', type=float, help='USD pour 1 EUR, constant sur la période ; obligatoire pour une référence en EUR')
     cmd = sub.add_parser('import-csv')
     cmd.add_argument('--series', required=True)
     cmd.add_argument('--file', type=Path, required=True)
@@ -103,7 +104,7 @@ def run(args, db):
     elif args.command in ('prices', 'deltas'):
         rows = price_rows(db, args.family, args.zone, args.start, args.end, args.series)
         if args.command == 'deltas':
-            emit_deltas(rows, finite_price(args.price))
+            emit_deltas(rows, finite_price(args.price), args.eur_usd)
         else:
             emit(rows, args.format)
     elif args.command == 'register-series':
