@@ -2,7 +2,7 @@
 
 > **Statut : défrichage préliminaire.** Ce document synthétise la note de recherche du 12 mai 2026 pour conserver le contexte de réflexion du projet, notamment à l’usage de l’assistant. Les choix présentés sont ceux explorés par la note ; ils ne constituent ni des directives de développement, ni des décisions validées pour le POC, ni une description des fonctionnalités déjà implémentées. Les seuils et pondérations restent des hypothèses indicatives.
 
-Source : [note_recherche_oil_gas_tbml_final.docx](note_recherche_oil_gas_tbml_final.docx). Domaine : Trade Finance Compliance / risque de marché. La synthèse conserve les 13 tableaux de la source, leurs valeurs et leurs libellés, ainsi que les principales formules. Elle ne procède à aucune validation externe, correction de fond ou critique des propositions. Les numéros de tableaux ci-dessous suivent leur ordre d’apparition dans le Word, y compris pour les tableaux initialement non numérotés.
+Source : `note_recherche_oil_gas_tbml_final.docx` (document source non inclus dans le dépôt). Domaine : Trade Finance Compliance / risque de marché. La synthèse conserve les 13 tableaux de la source, leurs valeurs et leurs libellés, ainsi que les principales formules. Elle ne procède à aucune validation externe, correction de fond ou critique des propositions. Les numéros de tableaux ci-dessous suivent leur ordre d’apparition dans le Word, y compris pour les tableaux initialement non numérotés.
 
 ## 1. Finalité et éléments saillants
 

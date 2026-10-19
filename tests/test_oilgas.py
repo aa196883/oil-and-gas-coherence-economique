@@ -7,7 +7,7 @@ import sqlite3
 import tempfile
 import unittest
 from unittest.mock import Mock, patch
-from oilgas.store import connect, initialize, record
+from oilgas.store import connect, initialize, record, selected, register_series
 from oilgas.sources import DataError, parse_yahoo, parse_csv, fetch_yahoo
 from oilgas.cli import collect, main, coverage
 
@@ -18,7 +18,7 @@ class OilGasTests(unittest.TestCase):
         self.path = Path(self.tmp.name) / 'test.sqlite'
         self.db = connect(self.path)
         initialize(self.db)
-        self.series = dict(self.db.execute("SELECT * FROM series WHERE id='yahoo-wti'").fetchone())
+        self.series = selected(self.db, ['yahoo-wti'])[0]
         self.day = date(2020, 4, 20)
 
     def tearDown(self):
@@ -35,9 +35,9 @@ class OilGasTests(unittest.TestCase):
 
     def test_catalog_and_idempotent_init(self):
         initialize(self.db)
-        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM routes').fetchone()[0], 20)
-        self.assertEqual(len(coverage(self.db)), 18)
-        self.assertEqual(self.db.execute("SELECT COUNT(*) FROM routes WHERE benchmark_id='brent'").fetchone()[0], 2)
+        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM metadata').fetchone()[0], 20)
+        self.assertEqual(len(coverage(self.db)), 20)
+        self.assertEqual(self.db.execute("SELECT COUNT(*) FROM metadata WHERE benchmark_id='brent'").fetchone()[0], 2)
 
     def test_native_negative_zero_missing_and_no_adjusted(self):
         rows, warnings = parse_yahoo(self.raw(), self.series, self.day, date(2020,4,22))
@@ -45,18 +45,19 @@ class OilGasTests(unittest.TestCase):
         self.assertTrue(warnings)
         self.assertTrue(all(r[2] is None for r in rows))
 
-    def test_revision_idempotence_and_provenance(self):
+    def test_revision_idempotence_and_bounds(self):
         for price in [12,12,13]:
             record(self.db, 'yahoo-wti', self.day, self.day, [(str(self.day),price,None)])
         row = self.db.execute('SELECT * FROM prices').fetchone()
         self.assertEqual(row['price'],13)
-        self.assertEqual(row['ingestion_id'],3)
+        metadata = self.db.execute('SELECT * FROM metadata WHERE id=?', (row['metadata_id'],)).fetchone()
+        self.assertEqual((metadata['start_date'], metadata['end_date']), (str(self.day), str(self.day)))
         self.assertEqual(self.db.execute('SELECT COUNT(*) FROM prices').fetchone()[0],1)
 
     def test_transaction_rolls_back(self):
         with self.assertRaises(sqlite3.IntegrityError):
             record(self.db, 'yahoo-wti', self.day, self.day, [(str(self.day),None,None)])
-        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM ingestions').fetchone()[0],0)
+        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM prices').fetchone()[0],0)
 
     def test_invalid_prices_metadata_and_lengths(self):
         for raw in [self.raw([1]), self.raw([1,float('inf'),3]), self.raw().replace(b'"USD"',b'"EUR"'), b'{}']:
@@ -85,11 +86,12 @@ class OilGasTests(unittest.TestCase):
         fetch.return_value=b'invalid JSON'
         result=collect(self.db,self.series,self.day,self.day,Path(self.tmp.name)/'raw',Mock())
         self.assertEqual(result['status'],'error')
-        row=self.db.execute('SELECT * FROM ingestions').fetchone()
-        self.assertTrue(Path(row['raw_path']).exists())
+        self.assertTrue(Path(result['raw_path']).exists())
+        row = self.db.execute("SELECT * FROM metadata WHERE series_id='yahoo-wti'").fetchone()
+        self.assertEqual(row['last_status'], 'error')
         self.assertEqual(self.db.execute('SELECT COUNT(*) FROM prices').fetchone()[0],0)
 
-    def test_query_alternative_includes_provenance(self):
+    def test_query_alternative_includes_source(self):
         record(self.db,'yahoo-brent',self.day,self.day,[(str(self.day),25,None)])
         output=io.StringIO()
         with contextlib.redirect_stdout(output):
@@ -98,7 +100,7 @@ class OilGasTests(unittest.TestCase):
         row=json.loads(output.getvalue())[0]
         self.assertEqual(row['qualification'],'alternative')
         self.assertEqual(row['native_unit'],'USD/BBL')
-        self.assertIn('retrieved_at',row)
+        self.assertEqual(row['series_id'], 'yahoo-brent')
 
     def deltas(self, *extra):
         output, errors = io.StringIO(), io.StringIO()
@@ -133,13 +135,14 @@ class OilGasTests(unittest.TestCase):
             code, output, _ = self.deltas(*extra)
             self.assertEqual((code, output), (1, ''))
         with self.db:
-            self.db.execute("UPDATE series SET unit='USD/MT' WHERE id='yahoo-brent'")
+            self.db.execute("UPDATE metadata SET unit='USD/MT' WHERE series_id='yahoo-brent'")
         self.assertIn('Unité', self.deltas()[2])
 
     def test_deltas_requires_one_series(self):
-        with self.db:
-            self.db.execute("UPDATE series SET benchmark_id='brent' WHERE id='yahoo-wti'")
-        for series in ('yahoo-brent', 'yahoo-wti'):
+        source = {k: v for k, v in selected(self.db, ['yahoo-brent'])[0].items() if k != 'enabled'}
+        source.update(id='manual-brent', provider='csv')
+        register_series(self.db, source)
+        for series in ('yahoo-brent', 'manual-brent'):
             record(self.db, series, '2024-01-02', '2024-01-02', [('2024-01-02', 80, None)])
         self.assertIn('--series', self.deltas()[2])
         self.assertEqual(self.deltas('--series', 'yahoo-brent')[0], 0)
@@ -158,10 +161,10 @@ class OilGasTests(unittest.TestCase):
                 self.assertEqual(main(base + ['import-csv','--series','manual-wti','--file',str(prices)]),0)
             prices.write_text('date,price\n2020-04-20,999\n2020-04-21,NaN\n')
             self.assertEqual(main(base + ['import-csv','--series','manual-wti','--file',str(prices)]),1)
-        rows = self.db.execute("SELECT * FROM prices WHERE series_id='manual-wti'").fetchall()
+        rows = self.db.execute("SELECT p.* FROM prices p JOIN metadata m ON m.id=p.metadata_id WHERE m.series_id='manual-wti'").fetchall()
         self.assertEqual(len(rows),1)
         self.assertEqual(rows[0]['price'],-37.63)
-        self.assertEqual(rows[0]['contract'],'CLK20')
+        self.assertEqual(set(rows[0].keys()), {'date', 'price', 'metadata_id'})
 
     def test_exchange_local_date(self):
         doc = json.loads(self.raw())
