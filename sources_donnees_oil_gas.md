@@ -55,7 +55,7 @@ Aucune série de remplacement n’est inventée pour les 11 références suivant
 
 **Databento** expose des génériques sans rétroajustement, avec règles de roll calendaire, volume ou intérêt ouvert. Cela constitue une piste payante pour les marchés pris en charge, pas une preuve de couverture des 18 références. [Documentation](https://www.databento.tech/docs/examples/futures/futures-introduction)
 
-**EIA** est accessible avec clé gratuite, mais ses Futures NYMEX s’arrêtent au 5 avril 2024. Le script EIA existant reste consacré au spot ; ses prix ne sont pas fusionnés avec les futures. [Historique EIA](https://www.eia.gov/dnav/pet/PET_PRI_FUT_S1_M.htm)
+**EIA** est accessible avec clé gratuite, mais ses Futures NYMEX s’arrêtent au 5 avril 2024. [Historique EIA](https://www.eia.gov/dnav/pet/PET_PRI_FUT_S1_M.htm)
 
 ## Restitution de la couverture
 

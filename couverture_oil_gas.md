@@ -35,7 +35,7 @@ Import réel vérifié le 16 octobre 2026, période demandée du 1er janvier 202
 - Import initial : 49 tranches annuelles archivées ; aucune tranche en erreur ou vide.
 - Réimport intégral WTI et mise à jour des sept séries : nombre total de prix inchangé, aucun doublon.
 - Intégrité SQLite et clés étrangères vérifiées.
-- 18 tests passent, dont les 6 tests EIA existants.
+- 12 tests hors réseau valident la collecte, les imports et la base SQLite.
 - Clôture WTI négative du 20 avril 2020 conservée.
 
 Les tranches initiales portent des avertissements de bornes ou de valeurs manquantes ; JKM porte aussi un avertissement de métadonnées incomplètes. Une borne tombant un jour sans cotation est signalée sans supposer de calendrier boursier. Aucune interpolation ne complète les séries.
