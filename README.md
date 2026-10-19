@@ -30,6 +30,33 @@ Les imports sont atomiques par série et tranche annuelle. Une réimportation re
 
 Les requêtes HTTP 429/500/502/503/504 et les erreurs réseau sont retentées jusqu’à quatre fois. Un échec d’une tranche est enregistré et les autres tranches peuvent être importées. Relancer `fetch` sur la période concernée permet de reprendre les échecs anciens ; `update` seul ne répare pas les trous historiques antérieurs à sa fenêtre.
 
+## Calculer les deltas
+
+```bash
+python -m oilgas deltas --price 100 --family 'Crude Oil (Brut)' --zone 'Europe / Afrique' --start 2024-01-01 --end 2024-01-31
+```
+
+`--price` est le prix à comparer, exprimé dans `expected_unit`. Pour chaque date disponible dans la période inclusive, le delta est `(price − prix_de_référence) / prix_de_référence` : `0.25` signifie +25 %. Cette V1 utilise directement les prix stockés, sans fret ni conversion, et ne complète pas les jours manquants.
+
+La sortie JSON contient uniquement un bloc `ref` (`logic`, `reference`, `expected_unit`, `instrument`) et une liste `deltas` de paires `[date, delta]`, une paire par ligne. Par exemple, pour des références de 80 et 125 et un prix fourni de 100 :
+
+```json
+{
+  "ref": {
+    "logic": "POL",
+    "reference": "Référence du catalogue",
+    "expected_unit": "USD/BBL",
+    "instrument": "Instrument de la série sélectionnée"
+  },
+  "deltas": [
+    ["2024-01-02", 0.25],
+    ["2024-01-03", -0.2]
+  ]
+}
+```
+
+Si plusieurs séries ont des observations, choisir avec `--series`. Une référence nulle, une unité native différente de l’unité attendue, un nombre non fini ou l’absence de données produit une erreur explicite sans résultat partiel.
+
 ## Importer un téléchargement externe
 
 Déclarer d’abord une série distincte avec un JSON contenant **tous** les champs suivants. Les valeurs sont à renseigner d’après la source réelle, notamment la nature du prix, l’unité et le roll ; l’exemple est un gabarit, pas un instrument validé :

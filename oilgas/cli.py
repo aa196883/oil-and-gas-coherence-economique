@@ -2,11 +2,12 @@ import argparse
 import csv
 from datetime import date, timedelta
 import json
+import math
 from pathlib import Path
 import sqlite3
 import sys
 import requests
-from .sources import DataError, fetch_yahoo, parse_yahoo, parse_csv
+from .sources import DataError, fetch_yahoo, parse_yahoo, parse_csv, finite_price
 from .store import connect, initialize, archive, record
 
 
@@ -17,6 +18,27 @@ def emit(rows, fmt='json'):
         writer = csv.DictWriter(sys.stdout, fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
+
+
+def emit_deltas(rows, price):
+    if len({row['series_id'] for row in rows}) != 1:
+        raise DataError('Plusieurs séries disponibles ; sélectionner une série avec --series')
+    ref = {key: rows[0][key] for key in ('logic', 'reference', 'expected_unit', 'instrument')}
+    deltas = []
+    for row in rows:
+        if row['native_unit'] != ref['expected_unit']:
+            raise DataError('Unité native incompatible avec expected_unit ; conversion nécessaire')
+        reference_price = finite_price(row['price'])
+        if reference_price == 0:
+            raise DataError(f"Prix de référence nul le {row['date']} : delta indéfini")
+        delta = (price - reference_price) / reference_price
+        if not math.isfinite(delta):
+            raise DataError(f"Delta non fini le {row['date']}")
+        deltas.append(json.dumps([row['date'], delta], ensure_ascii=False, allow_nan=False))
+    # Une paire par ligne pour garder la série lisible, même sur une longue période.
+    reference = json.dumps(ref, ensure_ascii=False, indent=2).replace('\n', '\n  ')
+    print('{\n  "ref": ' + reference + ',\n  "deltas": [\n    '
+          + ',\n    '.join(deltas) + '\n  ]\n}')
 
 
 def query(db, sql, params=()):
@@ -78,13 +100,17 @@ def parser():
         if name == 'fetch':
             cmd.add_argument('--start', type=date.fromisoformat, default=date(2020, 1, 1))
             cmd.add_argument('--end', type=date.fromisoformat, default=date.today() - timedelta(days=1))
-    cmd = sub.add_parser('prices')
-    cmd.add_argument('--family', required=True)
-    cmd.add_argument('--zone', required=True)
-    cmd.add_argument('--start', required=True, type=date.fromisoformat)
-    cmd.add_argument('--end', required=True, type=date.fromisoformat)
-    cmd.add_argument('--series')
-    cmd.add_argument('--format', choices=['json', 'csv'], default='json')
+    for name in ('prices', 'deltas'):
+        cmd = sub.add_parser(name)
+        cmd.add_argument('--family', required=True)
+        cmd.add_argument('--zone', required=True)
+        cmd.add_argument('--start', required=True, type=date.fromisoformat)
+        cmd.add_argument('--end', required=True, type=date.fromisoformat)
+        cmd.add_argument('--series')
+        if name == 'prices':
+            cmd.add_argument('--format', choices=['json', 'csv'], default='json')
+        else:
+            cmd.add_argument('--price', required=True, type=float)
     cmd = sub.add_parser('import-csv')
     cmd.add_argument('--series', required=True)
     cmd.add_argument('--file', type=Path, required=True)
@@ -123,7 +149,7 @@ def run(args, db):
                     print(f"{series['id']} {a}/{b}: {report['status']} ({report['count']})", file=sys.stderr)
         emit(reports)
         return int(any(r['status'] in ('error', 'empty') for r in reports) or not reports)
-    elif args.command == 'prices':
+    elif args.command in ('prices', 'deltas'):
         if args.start > args.end:
             raise DataError('start doit précéder end')
         route = db.execute('SELECT * FROM routes WHERE family=? AND zone=?', (args.family, args.zone)).fetchone()
@@ -144,7 +170,10 @@ def run(args, db):
         rows = query(db, sql + ' ORDER BY s.id,p.date', values)
         if not rows:
             raise DataError('Aucun prix disponible pour cette route, série et période ; consulter coverage')
-        emit(rows, args.format)
+        if args.command == 'deltas':
+            emit_deltas(rows, finite_price(args.price))
+        else:
+            emit(rows, args.format)
     elif args.command == 'register-series':
         data = json.loads(args.file.read_text())
         columns = ['id','benchmark_id','provider','symbol','instrument','exchange','currency','unit',

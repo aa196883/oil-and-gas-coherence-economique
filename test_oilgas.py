@@ -100,6 +100,50 @@ class OilGasTests(unittest.TestCase):
         self.assertEqual(row['native_unit'],'USD/BBL')
         self.assertIn('retrieved_at',row)
 
+    def deltas(self, *extra):
+        output, errors = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors):
+            code = main(['--db', str(self.path), 'deltas', '--price', '100',
+                         '--family', 'Crude Oil (Brut)', '--zone', 'Europe / Afrique',
+                         '--start', '2024-01-01', '--end', '2024-01-31', *extra])
+        return code, output.getvalue(), errors.getvalue()
+
+    def test_deltas_formula_bounds_and_simple_output(self):
+        record(self.db, 'yahoo-brent', '2023-12-31', '2024-02-01', [
+            ('2023-12-31', 1, None), ('2024-01-01', 80, None),
+            ('2024-01-15', 100, None), ('2024-01-31', 125, None),
+            ('2024-02-01', 1, None)])
+        code, output, errors = self.deltas()
+        self.assertEqual((code, errors), (0, ''))
+        result = json.loads(output)
+        self.assertEqual(set(result), {'ref', 'deltas'})
+        self.assertEqual(set(result['ref']), {'logic', 'reference', 'expected_unit', 'instrument'})
+        self.assertEqual(result['deltas'], [
+            ['2024-01-01', 0.25], ['2024-01-15', 0], ['2024-01-31', -0.2]])
+        self.assertIn('["2024-01-01", 0.25]', output)
+
+    def test_deltas_errors(self):
+        self.assertEqual(self.deltas()[0], 1)
+        record(self.db, 'yahoo-brent', '2024-01-01', '2024-01-01', [('2024-01-01', 0, None)])
+        self.assertIn('nul', self.deltas()[2])
+        record(self.db, 'yahoo-brent', '2024-01-01', '2024-01-01', [('2024-01-01', -50, None)])
+        self.assertEqual(json.loads(self.deltas()[1])['deltas'], [['2024-01-01', -3]])
+        for extra in [('--price', 'nan'), ('--price', 'inf'), ('--start', '2024-02-01'),
+                      ('--family', 'inconnue'), ('--series', 'inconnue')]:
+            code, output, _ = self.deltas(*extra)
+            self.assertEqual((code, output), (1, ''))
+        with self.db:
+            self.db.execute("UPDATE series SET unit='USD/MT' WHERE id='yahoo-brent'")
+        self.assertIn('Unité', self.deltas()[2])
+
+    def test_deltas_requires_one_series(self):
+        with self.db:
+            self.db.execute("UPDATE series SET benchmark_id='brent' WHERE id='yahoo-wti'")
+        for series in ('yahoo-brent', 'yahoo-wti'):
+            record(self.db, series, '2024-01-02', '2024-01-02', [('2024-01-02', 80, None)])
+        self.assertIn('--series', self.deltas()[2])
+        self.assertEqual(self.deltas('--series', 'yahoo-brent')[0], 0)
+
     def test_external_csv_workflow_and_invalid_import(self):
         metadata = {k: v for k, v in self.series.items() if k != 'enabled'}
         metadata.update(id='manual-wti', provider='external-csv', price_field='settlement')
