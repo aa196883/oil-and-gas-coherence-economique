@@ -1,6 +1,6 @@
 # Collecte Oil & Gas et base SQLite
 
-La V1 collecte des clôtures quotidiennes de sept génériques Yahoo, en unités natives, et conserve les 20 routes famille/zone de la note. Les alternatives, les références sans données et les limites du roll sont détaillées dans le [catalogue des sources](docs/sources_donnees_oil_gas.md) et le [rapport de couverture](docs/couverture_oil_gas.md).
+La V1 collecte des clôtures quotidiennes de sept génériques Yahoo, en unités natives, et conserve les 20 routes famille/zone de la note. Le [schéma de la base](docs/database.md) décrit les tables et leurs attributs ; la [couverture des données](docs/couverture.md) indique les données présentes par famille et corridor.
 
 Python **3.10+**, avec les dépendances de `requirements.txt`, suffit. Aucune clé ni inscription n’est nécessaire pour Yahoo.
 
